@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 stream: counterBloc.stateStream,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    _counter = snapshot.data ?? 0;
+                    _counter = snapshot.data!;
                     return Text(
                       '${snapshot.data}',
                       style: Theme.of(context).textTheme.headlineMedium,
@@ -64,12 +64,29 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          counterBloc.eventStreamSink.add(_counter);
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      floatingActionButton: SizedBox(
+        width: 200,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                counterBloc.eventStreamSink
+                    .add(IncrementEvent(value: _counter));
+              },
+              tooltip: 'Increment',
+              child: const Icon(Icons.add),
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                counterBloc.eventStreamSink
+                    .add(DecrementEvent(value: _counter));
+              },
+              tooltip: 'Decrement',
+              child: const Icon(Icons.remove),
+            ),
+          ],
+        ),
       ),
     );
   }
