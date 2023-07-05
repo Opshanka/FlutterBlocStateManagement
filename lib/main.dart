@@ -48,15 +48,26 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'You have pushed the button this many times:',
             ),
-            StreamBuilder<int>(
+            StreamBuilder<CounterState>(
                 stream: counterBloc.stateStream,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    _counter = snapshot.data!;
-                    return Text(
-                      '${snapshot.data}',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    );
+                    CounterState? _state = snapshot.data;
+                    if (_state is IncrementState) {
+                      _counter = _state.value;
+                      return Text(
+                        '$_counter',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      );
+                    } else if (_state is DecrementState) {
+                      _counter = _state.value;
+                      return Text(
+                        '$_counter',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      );
+                    } else {
+                      return Container();
+                    }
                   } else {
                     return CircularProgressIndicator();
                   }
