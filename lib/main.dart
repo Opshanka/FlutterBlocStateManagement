@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterblocstatemanegmentconcept/bloc/counter/counter_bloc.dart';
 import 'package:flutterblocstatemanegmentconcept/bloc/counter_bloc.dart';
 
 void main() {
@@ -32,7 +34,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  CounterBloc counterBloc = CounterBloc();
+  late CounterBloc counterBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    counterBloc = CounterBloc();
+  }
+
+  @override
+  void dispose() {
+    counterBloc.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,28 +62,23 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'You have pushed the button this many times:',
             ),
-            StreamBuilder<CounterState>(
-                stream: counterBloc.stateStream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    CounterState? _state = snapshot.data;
-                    if (_state is IncrementState) {
-                      _counter = _state.value;
-                      return Text(
-                        '$_counter',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      );
-                    } else if (_state is DecrementState) {
-                      _counter = _state.value;
-                      return Text(
-                        '$_counter',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      );
-                    } else {
-                      return Container();
-                    }
+            BlocBuilder(
+                bloc: counterBloc,
+                builder: (context, state) {
+                  if (state is IncrementState) {
+                    _counter = state.value;
+                    return Text(
+                      '${state.value}',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    );
+                  } else if (state is DecrementState) {
+                    _counter = state.value;
+                    return Text(
+                      '${state.value}',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    );
                   } else {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
                 }),
           ],
@@ -82,16 +91,14 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             FloatingActionButton(
               onPressed: () {
-                counterBloc.eventStreamSink
-                    .add(IncrementEvent(value: _counter));
+                counterBloc.add(IncrementEvent(value: _counter));
               },
               tooltip: 'Increment',
               child: const Icon(Icons.add),
             ),
             FloatingActionButton(
               onPressed: () {
-                counterBloc.eventStreamSink
-                    .add(DecrementEvent(value: _counter));
+                counterBloc.add(DecrementEvent(value: _counter));
               },
               tooltip: 'Decrement',
               child: const Icon(Icons.remove),
